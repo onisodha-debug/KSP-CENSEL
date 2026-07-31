@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validasi KSP Center Selatan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-100 min-h-screen flex justify-center">
+  <div class="w-full max-w-md bg-white min-h-screen shadow-lg flex flex-col relative">
+    
+    <!-- Header Aplikasi -->
+    <div class="bg-indigo-600 text-white p-4 font-bold text-lg text-center shadow sticky top-0 z-10">
+      Validasi KSP Center Selatan
+    </div>
+
+    <!-- Konten Utama (Daftar Sekolah) -->
+    <div id="content" class="p-4 space-y-3 flex-1 overflow-y-auto pb-20">
+      <p class="text-center text-gray-500 py-8">Memuat data KSP...</p>
+    </div>
+
+    <!-- POP-UP / MODAL CATATAN UMPAN BALIK -->
+    <div id="feedbackModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl flex flex-col space-y-3">
+        <div class="flex justify-between items-center border-b pb-2">
+          <h3 id="modalSchoolName" class="font-bold text-slate-800 text-base">Nama Sekolah</h3>
+          <button onclick="closeModal()" class="text-gray-400 hover:text-red-500 font-bold text-xl">&times;</button>
+        </div>
+        
+        <div class="py-2">
+          <p class="text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-1">Catatan Umpan Balik / Hasil Evaluasi:</p>
+          <div id="modalFeedbackText" class="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200 whitespace-pre-line max-h-60 overflow-y-auto">
+            Belum ada catatan.
+          </div>
+        </div>
+
+        <button onclick="closeModal()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2.5 rounded-xl text-center shadow">
+          Tutup
+        </button>
+      </div>
+    </div>
+
+    <!-- Navigation Bar Bawah -->
+    <div class="border-t bg-white p-3 flex justify-around text-xs text-gray-600 fixed bottom-0 w-full max-w-md z-10">
+      <button class="font-bold text-indigo-600">Daftar KSP</button>
+      <button onclick="location.reload()" class="text-gray-500 hover:text-indigo-600">🔄 Refresh Data</button>
+    </div>
+  </div>
+
+  <script>
+    // GANTI URL DI BAWAH DENGAN URL APPS SCRIPT YANG KAMU SALIN DI LANGKAH 1
+    const API_URL = "https://script.google.com/macros/s/AKfycbx2crLw8nEgVlLEd1HmXI1irXwo6IOGz_DJ5is9lhbRTgggk4zGRKyVXneNVFulLE5iFQ/exec";
+
+    let globalData = [];
+
+    fetch(API_URL)
+      .then(response => response.json())
+      .then(data => showData(data))
+      .catch(error => {
+        console.error("Error:", error);
+        document.getElementById('content').innerHTML = '<p class="text-center text-red-500 py-8">Gagal memuat data. Pastikan jaringan aman.</p>';
+      });
+
+    function showData(data) {
+      globalData = data;
+      let container = document.getElementById('content');
+      container.innerHTML = '';
+
+      if (!data || data.length <= 1) {
+        container.innerHTML = '<p class="text-center text-gray-400 py-8">Belum ada dokumen masuk.</p>';
+        return;
+      }
+
+      for (let i = 1; i < data.length; i++) {
+        let namaSekolah = data[i][1] || 'Nama Sekolah Kosong'; 
+        let jenisDokumen = data[i][5] || '-';                 
+        let status = data[i][7] || 'Belum Diperiksa';          
+        let catatan = data[i][8] || '';                       
+
+        let badgeColor = 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        if (status === 'Disetujui') {
+          badgeColor = 'bg-green-100 text-green-800 border-green-200';
+        } else if (status === 'Perlu Revisi') {
+          badgeColor = 'bg-red-100 text-red-800 border-red-200';
+        }
+
+        let feedbackButton = '';
+        if (catatan.toString().trim() !== '') {
+          feedbackButton = `
+            <button onclick="openModal(${i})" 
+                    class="mt-3 w-full text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-600 py-2 px-3 rounded-lg border border-indigo-200 flex items-center justify-center space-x-1">
+              <span>💬 Lihat Catatan Umpan Balik</span>
+            </button>
+          `;
+        } else {
+          feedbackButton = `
+            <div class="mt-2 text-[11px] italic text-gray-400 text-center">
+              Belum ada catatan umpan balik.
+            </div>
+          `;
+        }
+
+        container.innerHTML += `
+          <div class="p-4 border rounded-2xl bg-white shadow-sm hover:shadow-md transition">
+            <div class="flex justify-between items-start gap-2">
+              <div>
+                <h3 class="font-bold text-slate-800 text-sm leading-snug">${namaSekolah}</h3>
+                <p class="text-xs text-slate-500 mt-0.5">${jenisDokumen}</p>
+              </div>
+              <span class="text-[11px] px-2.5 py-1 rounded-full font-semibold border ${badgeColor} whitespace-nowrap">
+                ${status}
+              </span>
+            </div>
+            ${feedbackButton}
+          </div>
+        `;
+      }
+    }
+
+    function openModal(rowIndex) {
+      let namaSekolah = globalData[rowIndex][1] || 'Nama Sekolah';
+      let catatan = globalData[rowIndex][8] || 'Tidak ada catatan umpan balik.';
+      
+      document.getElementById('modalSchoolName').innerText = namaSekolah;
+      document.getElementById('modalFeedbackText').innerText = catatan;
+      document.getElementById('feedbackModal').classList.remove('hidden');
+    }
+
+    function closeModal() {
+      document.getElementById('feedbackModal').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
