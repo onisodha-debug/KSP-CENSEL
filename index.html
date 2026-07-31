@@ -48,7 +48,7 @@
   </div>
 
   <script>
-    // GANTI URL DI BAWAH DENGAN URL APPS SCRIPT YANG KAMU SALIN DI LANGKAH 1
+    // PASTEKAN URL APPS SCRIPT KAMU DI SINI
     const API_URL = "https://script.google.com/macros/s/AKfycbx2crLw8nEgVlLEd1HmXI1irXwo6IOGz_DJ5is9lhbRTgggk4zGRKyVXneNVFulLE5iFQ/exec";
 
     let globalData = [];
@@ -73,15 +73,27 @@
 
       for (let i = 1; i < data.length; i++) {
         let namaSekolah = data[i][1] || 'Nama Sekolah Kosong'; 
-        let jenisDokumen = data[i][5] || '-';                 
-        let status = data[i][7] || 'Belum Diperiksa';          
+        let jenisDokumen = (data[i][5] || 'Draft KSP').toString().trim();                 
+        let status = (data[i][7] || 'Belum Diperiksa').toString().trim();          
         let catatan = data[i][8] || '';                       
 
+        // Warna Badge Status Verifikasi (Disetujui / Perlu Revisi / Belum Diperiksa)
         let badgeColor = 'bg-yellow-100 text-yellow-800 border-yellow-200';
         if (status === 'Disetujui') {
           badgeColor = 'bg-green-100 text-green-800 border-green-200';
         } else if (status === 'Perlu Revisi') {
           badgeColor = 'bg-red-100 text-red-800 border-red-200';
+        }
+
+        // Warna Badge Jenis Dokumen (Draft / Revisi / Siap Penetapan)
+        let docBadgeColor = 'bg-blue-50 text-blue-700 border-blue-200';
+        let docIcon = '📄';
+        if (jenisDokumen.toLowerCase().includes('revisi')) {
+          docBadgeColor = 'bg-amber-50 text-amber-700 border-amber-300';
+          docIcon = '🔄';
+        } else if (jenisDokumen.toLowerCase().includes('penetapan')) {
+          docBadgeColor = 'bg-purple-50 text-purple-700 border-purple-300';
+          docIcon = '🌟';
         }
 
         let feedbackButton = '';
@@ -105,12 +117,20 @@
             <div class="flex justify-between items-start gap-2">
               <div>
                 <h3 class="font-bold text-slate-800 text-sm leading-snug">${namaSekolah}</h3>
-                <p class="text-xs text-slate-500 mt-0.5">${jenisDokumen}</p>
+                
+                <!-- Label Jenis Dokumen (Draft / Revisi / Penetapan) -->
+                <div class="mt-1.5 inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md border ${docBadgeColor}">
+                  <span>${docIcon}</span>
+                  <span>${jenisDokumen}</span>
+                </div>
               </div>
+
+              <!-- Label Status Verifikasi -->
               <span class="text-[11px] px-2.5 py-1 rounded-full font-semibold border ${badgeColor} whitespace-nowrap">
                 ${status}
               </span>
             </div>
+
             ${feedbackButton}
           </div>
         `;
