@@ -17,14 +17,14 @@
     <!-- AREA TOMBOL UTAMA (BAGIAN ATAS) -->
     <div class="p-3 bg-indigo-50 border-b border-indigo-100 grid grid-cols-2 gap-2 sticky top-[59px] z-10 shadow-sm">
       <!-- 1. Tombol Upload KSP -->
-      <a id="btnUpload" href="URL_GOOGLE_FORM_KAMU_DI_SINI" target="_blank" 
+      <a id="btnUpload" href="https://forms.gle/Rc3uSfo59cS2uCEo9" target="_blank" 
          class="flex flex-col items-center justify-center p-2.5 bg-white hover:bg-indigo-500 hover:text-white text-indigo-700 border border-indigo-200 rounded-xl font-semibold text-xs transition text-center shadow-sm">
         <span class="text-base mb-0.5">📤</span>
         <span>Upload KSP</span>
       </a>
 
       <!-- 2. Tombol Umpan Balik Validator -->
-      <a id="btnValidator" href="URL_GOOGLE_SHEETS_KAMU_DI_SINI" target="_blank" 
+      <a id="btnValidator" href="https://docs.google.com/spreadsheets/d/1i22W76k4Cl_uuujBPGWD8Y0aF23bmapUW1rS6zrneBg/edit?usp=sharing" target="_blank" 
          class="flex flex-col items-center justify-center p-2.5 bg-white hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 rounded-xl font-semibold text-xs transition text-center shadow-sm">
         <span class="text-base mb-0.5">✍️</span>
         <span>Umpan Balik Validator</span>
@@ -43,12 +43,12 @@
       </button>
       <button id="tabPenetapan" onclick="switchTab('penetapan')" 
               class="flex-1 py-2 px-1 rounded-lg text-center transition bg-white text-slate-600 border border-slate-200 hover:bg-slate-100">
-        🌟 KSP Siap Penetapan
+        🌟 Siap Penetapan
       </button>
     </div>
 
     <!-- Konten Utama (Daftar Sekolah Berdasarkan Tab) -->
-    <div id="content" class="p-4 space-y-3 flex-1 overflow-y-auto pb-20">
+    <div id="content" class="p-4 space-y-3 flex-1 overflow-y-auto pb-28">
       <p class="text-center text-gray-500 py-8">Memuat data KSP...</p>
     </div>
 
@@ -73,10 +73,17 @@
       </div>
     </div>
 
-    <!-- Navigation Bar Bawah -->
-    <div class="border-t bg-white p-3 flex justify-around text-xs text-gray-600 fixed bottom-0 w-full max-w-md z-10">
-      <button class="font-bold text-indigo-600">Daftar KSP</button>
-      <button onclick="location.reload()" class="text-gray-500 hover:text-indigo-600">🔄 Refresh Data</button>
+    <!-- Navigation Bar Bawah + Footer Copyright -->
+    <div class="border-t bg-white fixed bottom-0 w-full max-w-md z-10 flex flex-col items-center">
+      <div class="p-2.5 flex justify-around text-xs text-gray-600 w-full">
+        <button class="font-bold text-indigo-600">Daftar KSP</button>
+        <button onclick="location.reload()" class="text-gray-500 hover:text-indigo-600">🔄 Refresh Data</button>
+      </div>
+      
+      <!-- KETERANGAN VERSI & COPYRIGHT -->
+      <div class="w-full bg-slate-50 border-t border-slate-100 py-1.5 text-center text-[10px] text-slate-400 font-medium">
+        v1.2 • &copy; 2026 <span class="font-semibold text-slate-500">Sony Yudha Pristiwanto</span>. All rights reserved.
+      </div>
     </div>
   </div>
 
@@ -127,12 +134,10 @@
         let status = (globalData[i][7] || 'Belum Diperiksa').toString().trim();          
         let catatan = globalData[i][8] || '';                       
 
-        // 1. ABAIKAN BARIS KOSONG: Jika nama sekolah kosong atau jenis dokumen kosong, lompati!
         if (!namaSekolah || namaSekolah === 'Nama Sekolah Kosong' || !jenisDokumen) {
           continue;
         }
 
-        // 2. FILTER BERDASARKAN TAB YANG DIKLIK
         let jenisLower = jenisDokumen.toLowerCase();
         let shouldShow = false;
 
@@ -147,7 +152,6 @@
         if (!shouldShow) continue;
         count++;
 
-        // Warna Badge Status Verifikasi
         let badgeColor = 'bg-yellow-100 text-yellow-800 border-yellow-200';
         if (status === 'Disetujui') {
           badgeColor = 'bg-green-100 text-green-800 border-green-200';
@@ -155,7 +159,6 @@
           badgeColor = 'bg-red-100 text-red-800 border-red-200';
         }
 
-        // Label Icon Jenis Dokumen
         let docBadgeColor = 'bg-blue-50 text-blue-700 border-blue-200';
         let docIcon = '📄';
         if (currentTab === 'revisi') {
@@ -203,7 +206,6 @@
         `;
       }
 
-      // TAMPILKAN PESAN JIKA BELUM ADA DOKUMEN DI KATEGORI TERSEBUT
       if (count === 0) {
         let pesanKategori = "Draft KSP";
         if (currentTab === 'revisi') pesanKategori = "KSP Revisi";
