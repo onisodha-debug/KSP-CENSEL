@@ -17,14 +17,14 @@
     <!-- AREA TOMBOL UTAMA (BAGIAN ATAS) -->
     <div class="p-3 bg-indigo-50 border-b border-indigo-100 grid grid-cols-2 gap-2 sticky top-[59px] z-10 shadow-sm">
       <!-- 1. Tombol Upload KSP -->
-      <a id="btnUpload" href="https://forms.gle/Rc3uSfo59cS2uCEo9" target="_blank" 
+      <a id="btnUpload" href="URL_GOOGLE_FORM_KAMU_DI_SINI" target="_blank" 
          class="flex flex-col items-center justify-center p-2.5 bg-white hover:bg-indigo-500 hover:text-white text-indigo-700 border border-indigo-200 rounded-xl font-semibold text-xs transition text-center shadow-sm">
         <span class="text-base mb-0.5">📤</span>
         <span>Upload KSP</span>
       </a>
 
       <!-- 2. Tombol Umpan Balik Validator -->
-      <a id="btnValidator" href="https://docs.google.com/spreadsheets/d/1i22W76k4Cl_uuujBPGWD8Y0aF23bmapUW1rS6zrneBg/edit?usp=sharing" target="_blank" 
+      <a id="btnValidator" href="URL_GOOGLE_SHEETS_KAMU_DI_SINI" target="_blank" 
          class="flex flex-col items-center justify-center p-2.5 bg-white hover:bg-emerald-600 hover:text-white text-emerald-700 border border-emerald-200 rounded-xl font-semibold text-xs transition text-center shadow-sm">
         <span class="text-base mb-0.5">✍️</span>
         <span>Umpan Balik Validator</span>
@@ -84,7 +84,7 @@
     const API_URL = "https://script.google.com/macros/s/AKfycbx2crLw8nEgVlLEd1HmXI1irXwo6IOGz_DJ5is9lhbRTgggk4zGRKyVXneNVFulLE5iFQ/exec";
 
     let globalData = [];
-    let currentTab = 'draft'; // Tab awal default: draft
+    let currentTab = 'draft'; 
 
     fetch(API_URL)
       .then(response => response.json())
@@ -100,7 +100,6 @@
     function switchTab(tabName) {
       currentTab = tabName;
       
-      // Reset Style Semua Tab
       const activeClass = "bg-indigo-600 text-white shadow";
       const inactiveClass = "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100";
 
@@ -116,19 +115,24 @@
       container.innerHTML = '';
 
       if (!globalData || globalData.length <= 1) {
-        container.innerHTML = '<p class="text-center text-gray-400 py-8">Belum ada dokumen masuk.</p>';
+        container.innerHTML = '<p class="text-center text-gray-400 py-8">Belum ada dokumen yang diunggah.</p>';
         return;
       }
 
       let count = 0;
 
       for (let i = 1; i < globalData.length; i++) {
-        let namaSekolah = globalData[i][1] || 'Nama Sekolah Kosong'; 
-        let jenisDokumen = (globalData[i][5] || 'Draft KSP').toString().trim();                 
+        let namaSekolah = (globalData[i][1] || '').toString().trim(); 
+        let jenisDokumen = (globalData[i][5] || '').toString().trim();                 
         let status = (globalData[i][7] || 'Belum Diperiksa').toString().trim();          
         let catatan = globalData[i][8] || '';                       
 
-        // Filter berdasarkan Tab
+        // 1. ABAIKAN BARIS KOSONG: Jika nama sekolah kosong atau jenis dokumen kosong, lompati!
+        if (!namaSekolah || namaSekolah === 'Nama Sekolah Kosong' || !jenisDokumen) {
+          continue;
+        }
+
+        // 2. FILTER BERDASARKAN TAB YANG DIKLIK
         let jenisLower = jenisDokumen.toLowerCase();
         let shouldShow = false;
 
@@ -199,8 +203,19 @@
         `;
       }
 
+      // TAMPILKAN PESAN JIKA BELUM ADA DOKUMEN DI KATEGORI TERSEBUT
       if (count === 0) {
-        container.innerHTML = `<p class="text-center text-gray-400 py-8">Tidak ada dokumen di kategori ini.</p>`;
+        let pesanKategori = "Draft KSP";
+        if (currentTab === 'revisi') pesanKategori = "KSP Revisi";
+        if (currentTab === 'penetapan') pesanKategori = "KSP Siap Penetapan";
+
+        container.innerHTML = `
+          <div class="text-center py-10 px-4">
+            <div class="text-3xl mb-2">📥</div>
+            <p class="text-sm font-semibold text-slate-600">Belum Ada Dokumen</p>
+            <p class="text-xs text-slate-400 mt-1">Belum ada sekolah yang mengunggah <br><span class="font-medium text-indigo-600">${pesanKategori}</span>.</p>
+          </div>
+        `;
       }
     }
 
