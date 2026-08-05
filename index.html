@@ -7,7 +7,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-100 min-h-screen flex justify-center">
-  <div class="w-full max-w-md bg-white min-h-screen shadow-lg flex flex-col relative">
+  <!-- Pembungkus Fleksibel: Max W-MD di Mobile, Max W-3XL di PC/Tablet -->
+  <div class="w-full max-w-md md:max-w-3xl bg-white min-h-screen shadow-lg flex flex-col relative">
     
     <!-- Header Utama -->
     <div class="bg-indigo-600 text-white p-4 font-bold text-lg text-center shadow sticky top-0 z-20 flex justify-between items-center">
@@ -15,23 +16,23 @@
     </div>
 
     <!-- AREA TOMBOL UTAMA (BAGIAN ATAS) -->
-    <div class="p-3 bg-indigo-50 border-b border-indigo-100 grid grid-cols-2 gap-2 sticky top-[59px] z-10 shadow-sm">
+    <div class="p-3 bg-indigo-50 border-b border-indigo-100 grid grid-cols-2 gap-2 sm:gap-4 sticky top-[59px] z-10 shadow-sm">
       <!-- 1. Tombol Upload KSP -->
       <a id="btnUpload" href="https://forms.gle/Rc3uSfo59cS2uCEo9" target="_blank" 
-         class="flex flex-col items-center justify-center p-2.5 bg-white hover:bg-indigo-500 hover:text-white text-indigo-700 border border-indigo-200 rounded-xl font-semibold text-xs transition text-center shadow-sm">
-        <span class="text-base mb-0.5">📤</span>
+         class="flex flex-col sm:flex-row items-center justify-center p-2.5 bg-white hover:bg-indigo-500 hover:text-white text-indigo-700 border border-indigo-200 rounded-xl font-semibold text-xs sm:text-sm transition text-center shadow-sm gap-1 sm:gap-2">
+        <span class="text-base">📤</span>
         <span>Upload KSP</span>
       </a>
       <!-- 2. Tombol Login/Akses Pengawas -->
       <button id="btnPengawas" onclick="handlePengawasClick()" 
-         class="flex flex-col items-center justify-center p-2.5 bg-amber-500 hover:bg-amber-600 text-white border border-amber-300 rounded-xl font-semibold text-xs transition text-center shadow-sm">
-        <span class="text-base mb-0.5">🔑</span>
+         class="flex flex-col sm:flex-row items-center justify-center p-2.5 bg-amber-500 hover:bg-amber-600 text-white border border-amber-300 rounded-xl font-semibold text-xs sm:text-sm transition text-center shadow-sm gap-1 sm:gap-2">
+        <span class="text-base">🔑</span>
         <span id="txtBtnPengawas">Akses Pengawas</span>
       </button>
     </div>
 
     <!-- TAB KLASIFIKASI STATUS -->
-    <div class="bg-slate-50 border-b border-slate-200 p-1.5 flex justify-between gap-1 text-xs font-semibold sticky top-[133px] z-10 shadow-sm">
+    <div class="bg-slate-50 border-b border-slate-200 p-1.5 sm:p-2 flex justify-between gap-1 sm:gap-3 text-xs sm:text-sm font-semibold sticky top-[125px] sm:top-[115px] z-10 shadow-sm">
       <button id="tabDraft" onclick="switchTab('draft')" 
               class="flex-1 py-2 px-1 rounded-lg text-center transition bg-indigo-600 text-white shadow">
         📄 Draft KSP
@@ -113,7 +114,7 @@
     </div>
 
     <!-- Navigation Bar Bawah + Footer Copyright -->
-    <div class="border-t bg-white fixed bottom-0 w-full max-w-md z-10 flex flex-col items-center">
+    <div class="border-t bg-white fixed bottom-0 w-full max-w-md md:max-w-3xl z-10 flex flex-col items-center">
       <div class="p-2.5 flex justify-around text-xs text-gray-600 w-full">
         <button class="font-bold text-indigo-600">Daftar KSP</button>
         <button onclick="location.reload()" class="text-gray-500 hover:text-indigo-600">🔄 Refresh Data</button>
@@ -153,7 +154,7 @@
           isPengawas = false;
           savedPin = "";
           document.getElementById('txtBtnPengawas').innerText = "Akses Pengawas";
-          document.getElementById('btnPengawas').className = "flex flex-col items-center justify-center p-2.5 bg-amber-500 hover:bg-amber-600 text-white border border-amber-300 rounded-xl font-semibold text-xs transition text-center shadow-sm";
+          document.getElementById('btnPengawas').className = "flex flex-col sm:flex-row items-center justify-center p-2.5 bg-amber-500 hover:bg-amber-600 text-white border border-amber-300 rounded-xl font-semibold text-xs sm:text-sm transition text-center shadow-sm gap-1 sm:gap-2";
           renderCurrentTab();
         }
       } else {
@@ -172,7 +173,7 @@
       savedPin = pinVal;
       isPengawas = true;
       document.getElementById('txtBtnPengawas').innerText = "Pengawas (Keluar)";
-      document.getElementById('btnPengawas').className = "flex flex-col items-center justify-center p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-400 rounded-xl font-semibold text-xs transition text-center shadow-sm";
+      document.getElementById('btnPengawas').className = "flex flex-col sm:flex-row items-center justify-center p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-400 rounded-xl font-semibold text-xs sm:text-sm transition text-center shadow-sm gap-1 sm:gap-2";
       closeModal('pinModal');
       renderCurrentTab();
     }
@@ -247,13 +248,13 @@
           <div class="p-4 border rounded-2xl bg-white shadow-sm hover:shadow-md transition">
             <div class="flex justify-between items-start gap-2">
               <div>
-                <h3 class="font-bold text-slate-800 text-sm leading-snug">${namaSekolah}</h3>
-                <div class="mt-1.5 inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md border ${docBadgeColor}">
+                <h3 class="font-bold text-slate-800 text-sm sm:text-base leading-snug">${namaSekolah}</h3>
+                <div class="mt-1.5 inline-flex items-center gap-1 text-[11px] sm:text-xs font-medium px-2 py-0.5 rounded-md border ${docBadgeColor}">
                   <span>${docIcon}</span>
                   <span>${jenisDokumen}</span>
                 </div>
               </div>
-              <span class="text-[11px] px-2.5 py-1 rounded-full font-semibold border ${badgeColor} whitespace-nowrap">
+              <span class="text-[11px] sm:text-xs px-2.5 py-1 rounded-full font-semibold border ${badgeColor} whitespace-nowrap">
                 ${status}
               </span>
             </div>
