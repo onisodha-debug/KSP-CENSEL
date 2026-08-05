@@ -5,7 +5,341 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Validasi KSP SMP Negeri Center Selatan</title>
   <script src="https://cdn.tailwindcss.com"></script>
+</head><!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Validasi KSP SMP Negeri Center Selatan</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
+<body class="bg-slate-100 min-h-screen flex justify-center">
+  <div class="w-full max-w-md bg-white min-h-screen shadow-lg flex flex-col relative">
+    
+    <!-- Header Utama -->
+    <div class="bg-indigo-600 text-white p-4 font-bold text-lg text-center shadow sticky top-0 z-20 flex justify-between items-center">
+      <span class="w-full text-center">Validasi KSP SMP Negeri Center Selatan</span>
+    </div>
+
+    <!-- AREA TOMBOL UTAMA (BAGIAN ATAS) -->
+    <div class="p-3 bg-indigo-50 border-b border-indigo-100 grid grid-cols-2 gap-2 sticky top-[59px] z-10 shadow-sm">
+      <!-- 1. Tombol Upload KSP -->
+      <a id="btnUpload" href="https://forms.gle/Rc3uSfo59cS2uCEo9" target="_blank" 
+         class="flex flex-col items-center justify-center p-2.5 bg-white hover:bg-indigo-500 hover:text-white text-indigo-700 border border-indigo-200 rounded-xl font-semibold text-xs transition text-center shadow-sm">
+        <span class="text-base mb-0.5">📤</span>
+        <span>Upload KSP</span>
+      </a>
+      <!-- 2. Tombol Login/Akses Pengawas -->
+      <button id="btnPengawas" onclick="handlePengawasClick()" 
+         class="flex flex-col items-center justify-center p-2.5 bg-amber-500 hover:bg-amber-600 text-white border border-amber-300 rounded-xl font-semibold text-xs transition text-center shadow-sm">
+        <span class="text-base mb-0.5">🔑</span>
+        <span id="txtBtnPengawas">Akses Pengawas</span>
+      </button>
+    </div>
+
+    <!-- TAB KLASIFIKASI STATUS -->
+    <div class="bg-slate-50 border-b border-slate-200 p-1.5 flex justify-between gap-1 text-xs font-semibold sticky top-[133px] z-10 shadow-sm">
+      <button id="tabDraft" onclick="switchTab('draft')" 
+              class="flex-1 py-2 px-1 rounded-lg text-center transition bg-indigo-600 text-white shadow">
+        📄 Draft KSP
+      </button>
+      <button id="tabRevisi" onclick="switchTab('revisi')" 
+              class="flex-1 py-2 px-1 rounded-lg text-center transition bg-white text-slate-600 border border-slate-200 hover:bg-slate-100">
+        🔄 KSP Revisi
+      </button>
+      <button id="tabPenetapan" onclick="switchTab('penetapan')" 
+              class="flex-1 py-2 px-1 rounded-lg text-center transition bg-white text-slate-600 border border-slate-200 hover:bg-slate-100">
+        🌟 Siap Penetapan
+      </button>
+    </div>
+
+    <!-- Konten Utama (Daftar Sekolah) -->
+    <div id="content" class="p-4 space-y-3 flex-1 overflow-y-auto pb-28">
+      <p class="text-center text-gray-500 py-8">Memuat data KSP...</p>
+    </div>
+
+    <!-- MODAL 1: LIHAT CATATAN UMPAN BALIK (UMUM) -->
+    <div id="feedbackModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl flex flex-col space-y-3">
+        <div class="flex justify-between items-center border-b pb-2">
+          <h3 id="modalSchoolName" class="font-bold text-slate-800 text-base">Nama Sekolah</h3>
+          <button onclick="closeModal('feedbackModal')" class="text-gray-400 hover:text-red-500 font-bold text-xl">&times;</button>
+        </div>
+        
+        <div class="py-2">
+          <p class="text-xs font-semibold text-indigo-600 uppercase tracking-wider mb-1">Catatan Umpan Balik / Hasil Evaluasi:</p>
+          <div id="modalFeedbackText" class="text-sm text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-200 whitespace-pre-line max-h-60 overflow-y-auto">
+            Belum ada catatan.
+          </div>
+        </div>
+        <button onclick="closeModal('feedbackModal')" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-medium text-sm py-2.5 rounded-xl text-center shadow">
+          Tutup
+        </button>
+      </div>
+    </div>
+
+    <!-- MODAL 2: INPUT PIN PENGAWAS -->
+    <div id="pinModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl max-w-xs w-full p-5 shadow-2xl flex flex-col space-y-3">
+        <h3 class="font-bold text-slate-800 text-base text-center border-b pb-2">🔐 Verifikasi PIN Pengawas</h3>
+        <p class="text-xs text-slate-500 text-center">Masukkan PIN pengawas untuk membuka mode input validasi.</p>
+        <input type="password" id="inputPin" placeholder="****" class="w-full border rounded-xl p-2.5 text-center font-bold text-lg border-slate-300 focus:outline-none focus:border-indigo-500" onkeyup="if(event.key==='Enter') verifikasiPin()">
+        <p id="pinError" class="text-xs text-red-500 text-center hidden">PIN tidak boleh kosong!</p>
+        <div class="flex gap-2">
+          <button onclick="closeModal('pinModal')" class="w-1/2 bg-gray-200 hover:bg-gray-300 text-slate-700 font-medium text-xs py-2 rounded-xl">Batal</button>
+          <button onclick="verifikasiPin()" class="w-1/2 bg-amber-500 hover:bg-amber-600 text-white font-medium text-xs py-2 rounded-xl shadow">Masuk</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 3: INPUT VALIDASI PENGAWAS -->
+    <div id="inputValidasiModal" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center p-4 z-50">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-2xl flex flex-col space-y-3">
+        <div class="flex justify-between items-center border-b pb-2">
+          <h3 id="valSchoolName" class="font-bold text-slate-800 text-base">Form Validasi</h3>
+          <button onclick="closeModal('inputValidasiModal')" class="text-gray-400 hover:text-red-500 font-bold text-xl">&times;</button>
+        </div>
+        <input type="hidden" id="valRowIndex">
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Status Validasi</label>
+          <select id="valStatus" class="w-full border border-slate-300 rounded-xl p-2 text-xs focus:outline-none focus:border-indigo-500">
+            <option value="Belum Diperiksa">Belum Diperiksa</option>
+            <option value="Perlu Revisi">Perlu Revisi</option>
+            <option value="Disetujui">Disetujui</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Catatan Umpan Balik</label>
+          <textarea id="valFeedback" rows="4" placeholder="Ketik catatan evaluasi pengawas..." class="w-full border border-slate-300 rounded-xl p-2.5 text-xs focus:outline-none focus:border-indigo-500"></textarea>
+        </div>
+        <div class="flex gap-2 pt-2">
+          <button onclick="closeModal('inputValidasiModal')" class="w-1/2 bg-gray-200 text-slate-700 font-medium text-xs py-2.5 rounded-xl">Batal</button>
+          <button id="btnSimpan" onclick="simpanValidasi()" class="w-1/2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs py-2.5 rounded-xl shadow">Simpan Data</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Bar Bawah + Footer Copyright -->
+    <div class="border-t bg-white fixed bottom-0 w-full max-w-md z-10 flex flex-col items-center">
+      <div class="p-2.5 flex justify-around text-xs text-gray-600 w-full">
+        <button class="font-bold text-indigo-600">Daftar KSP</button>
+        <button onclick="location.reload()" class="text-gray-500 hover:text-indigo-600">🔄 Refresh Data</button>
+      </div>
+      
+      <!-- KETERANGAN VERSI & COPYRIGHT -->
+      <div class="w-full bg-slate-50 border-t border-slate-100 py-1.5 text-center text-[10px] text-slate-400 font-medium">
+        v1.2 • &copy; 2026 <span class="font-semibold text-slate-500">Sony Yudha Pristiwanto</span>. All rights reserved.
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbycy4j_7BTGO3w6QJ9ih-bN1WVReVMT8D6fxfLgCbi_LDeshiWTgSC222ZmgeiZP-l-bw/exec";
+    let globalData = [];
+    let currentTab = 'draft';
+    let isPengawas = false;
+    let savedPin = "";
+
+    // Ambil Data dari Apps Script
+    function fetchData() {
+      fetch(API_URL)
+        .then(response => response.json())
+        .then(data => {
+          globalData = data;
+          renderCurrentTab();
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          document.getElementById('content').innerHTML = '<p class="text-center text-red-500 py-8">Gagal memuat data. Pastikan jaringan aman.</p>';
+        });
+    }
+
+    function handlePengawasClick() {
+      if (isPengawas) {
+        if (confirm("Keluar dari Akses Pengawas?")) {
+          isPengawas = false;
+          savedPin = "";
+          document.getElementById('txtBtnPengawas').innerText = "Akses Pengawas";
+          document.getElementById('btnPengawas').className = "flex flex-col items-center justify-center p-2.5 bg-amber-500 hover:bg-amber-600 text-white border border-amber-300 rounded-xl font-semibold text-xs transition text-center shadow-sm";
+          renderCurrentTab();
+        }
+      } else {
+        document.getElementById('inputPin').value = "";
+        document.getElementById('pinError').classList.add('hidden');
+        document.getElementById('pinModal').classList.remove('hidden');
+      }
+    }
+
+    function verifikasiPin() {
+      const pinVal = document.getElementById('inputPin').value.trim();
+      if (!pinVal) {
+        document.getElementById('pinError').classList.remove('hidden');
+        return;
+      }
+      savedPin = pinVal;
+      isPengawas = true;
+      document.getElementById('txtBtnPengawas').innerText = "Pengawas (Keluar)";
+      document.getElementById('btnPengawas').className = "flex flex-col items-center justify-center p-2.5 bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-400 rounded-xl font-semibold text-xs transition text-center shadow-sm";
+      closeModal('pinModal');
+      renderCurrentTab();
+    }
+
+    function switchTab(tabName) {
+      currentTab = tabName;
+      const activeClass = "bg-indigo-600 text-white shadow";
+      const inactiveClass = "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100";
+      document.getElementById('tabDraft').className = `flex-1 py-2 px-1 rounded-lg text-center transition ${tabName === 'draft' ? activeClass : inactiveClass}`;
+      document.getElementById('tabRevisi').className = `flex-1 py-2 px-1 rounded-lg text-center transition ${tabName === 'revisi' ? activeClass : inactiveClass}`;
+      document.getElementById('tabPenetapan').className = `flex-1 py-2 px-1 rounded-lg text-center transition ${tabName === 'penetapan' ? activeClass : inactiveClass}`;
+      renderCurrentTab();
+    }
+
+    function renderCurrentTab() {
+      let container = document.getElementById('content');
+      container.innerHTML = '';
+      if (!globalData || globalData.length <= 1) {
+        container.innerHTML = '<p class="text-center text-gray-400 py-8">Belum ada dokumen yang diunggah.</p>';
+        return;
+      }
+      let count = 0;
+      for (let i = 1; i < globalData.length; i++) {
+        let namaSekolah = (globalData[i][1] || '').toString().trim(); 
+        let jenisDokumen = (globalData[i][5] || '').toString().trim();                 
+        let status = (globalData[i][7] || 'Belum Diperiksa').toString().trim();          
+        let catatan = globalData[i][8] || '';                       
+        
+        if (!namaSekolah || namaSekolah === 'Nama Sekolah Kosong' || !jenisDokumen) continue;
+        
+        let jenisLower = jenisDokumen.toLowerCase();
+        let shouldShow = false;
+        if (currentTab === 'draft' && jenisLower.includes('draft')) shouldShow = true;
+        else if (currentTab === 'revisi' && jenisLower.includes('revisi')) shouldShow = true;
+        else if (currentTab === 'penetapan' && jenisLower.includes('penetapan')) shouldShow = true;
+        
+        if (!shouldShow) continue;
+        count++;
+
+        let badgeColor = 'bg-yellow-100 text-yellow-800 border-yellow-200';
+        if (status === 'Disetujui') badgeColor = 'bg-green-100 text-green-800 border-green-200';
+        else if (status === 'Perlu Revisi') badgeColor = 'bg-red-100 text-red-800 border-red-200';
+
+        let docBadgeColor = 'bg-blue-50 text-blue-700 border-blue-200';
+        let docIcon = '📄';
+        if (currentTab === 'revisi') { docBadgeColor = 'bg-amber-50 text-amber-700 border-amber-300'; docIcon = '🔄'; }
+        else if (currentTab === 'penetapan') { docBadgeColor = 'bg-purple-50 text-purple-700 border-purple-300'; docIcon = '🌟'; }
+
+        // Area Tombol berdasarkan Akses Pengawas
+        let actionArea = '';
+        if (isPengawas) {
+          actionArea = `
+            <button onclick="openFormValidasi('${namaSekolah.replace(/'/g, "\\'")}', ${i+1}, '${status.replace(/'/g, "\\'")}', '${catatan.replace(/'/g, "\\'").replace(/\n/g, "\\n")}')" 
+                    class="mt-3 w-full text-xs font-semibold bg-amber-50 hover:bg-amber-100 text-amber-700 py-2 px-3 rounded-lg border border-amber-300 flex items-center justify-center space-x-1 shadow-sm">
+              <span>✍️ Input / Edit Validasi</span>
+            </button>
+          `;
+        } else {
+          if (catatan.toString().trim() !== '') {
+            actionArea = `
+              <button onclick="openModal('feedbackModal', ${i})" 
+                      class="mt-3 w-full text-xs font-semibold bg-indigo-50 hover:bg-indigo-100 text-indigo-600 py-2 px-3 rounded-lg border border-indigo-200 flex items-center justify-center space-x-1">
+                <span>💬 Lihat Catatan Umpan Balik</span>
+              </button>
+            `;
+          } else {
+            actionArea = `<div class="mt-2 text-[11px] italic text-gray-400 text-center">Belum ada catatan umpan balik.</div>`;
+          }
+        }
+
+        container.innerHTML += `
+          <div class="p-4 border rounded-2xl bg-white shadow-sm hover:shadow-md transition">
+            <div class="flex justify-between items-start gap-2">
+              <div>
+                <h3 class="font-bold text-slate-800 text-sm leading-snug">${namaSekolah}</h3>
+                <div class="mt-1.5 inline-flex items-center gap-1 text-[11px] font-medium px-2 py-0.5 rounded-md border ${docBadgeColor}">
+                  <span>${docIcon}</span>
+                  <span>${jenisDokumen}</span>
+                </div>
+              </div>
+              <span class="text-[11px] px-2.5 py-1 rounded-full font-semibold border ${badgeColor} whitespace-nowrap">
+                ${status}
+              </span>
+            </div>
+            ${actionArea}
+          </div>
+        `;
+      }
+
+      if (count === 0) {
+        let pesanKategori = currentTab === 'revisi' ? "KSP Revisi" : (currentTab === 'penetapan' ? "KSP Siap Penetapan" : "Draft KSP");
+        container.innerHTML = `
+          <div class="text-center py-10 px-4">
+            <div class="text-3xl mb-2">📥</div>
+            <p class="text-sm font-semibold text-slate-600">Belum Ada Dokumen</p>
+            <p class="text-xs text-slate-400 mt-1">Belum ada sekolah yang mengunggah <br><span class="font-medium text-indigo-600">${pesanKategori}</span>.</p>
+          </div>
+        `;
+      }
+    }
+
+    function openModal(modalId, rowIndex) {
+      if (rowIndex !== undefined) {
+        document.getElementById('modalSchoolName').innerText = globalData[rowIndex][1] || 'Nama Sekolah';
+        document.getElementById('modalFeedbackText').innerText = globalData[rowIndex][8] || 'Tidak ada catatan umpan balik.';
+      }
+      document.getElementById(modalId).classList.remove('hidden');
+    }
+
+    function openFormValidasi(sekolah, sheetRowIndex, currentStatus, currentFeedback) {
+      document.getElementById('valSchoolName').innerText = sekolah;
+      document.getElementById('valRowIndex').value = sheetRowIndex;
+      document.getElementById('valStatus').value = currentStatus || "Belum Diperiksa";
+      document.getElementById('valFeedback').value = currentFeedback;
+      document.getElementById('inputValidasiModal').classList.remove('hidden');
+    }
+
+    async function simpanValidasi() {
+      const btn = document.getElementById('btnSimpan');
+      btn.disabled = true;
+      btn.innerText = "Menyimpan...";
+
+      const payload = {
+        pin: savedPin,
+        rowIndex: document.getElementById('valRowIndex').value,
+        status: document.getElementById('valStatus').value,
+        feedback: document.getElementById('valFeedback').value
+      };
+
+      try {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          body: JSON.stringify(payload)
+        });
+        const result = await response.json();
+
+        if (result.status === "success") {
+          alert("✓ Validasi berhasil disimpan!");
+          closeModal('inputValidasiModal');
+          fetchData(); // Reload data dari Google Sheet
+        } else {
+          alert("Gagal: " + result.message);
+        }
+      } catch (err) {
+        alert("Terjadi kesalahan koneksi saat menyimpan.");
+      } finally {
+        btn.disabled = false;
+        btn.innerText = "Simpan Data";
+      }
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+
+    // Jalankan pertama kali saat halaman dimuat
+    fetchData();
+  </script>
+</body>
+</html>
 <body class="bg-slate-100 min-h-screen flex justify-center">
   <div class="w-full max-w-md bg-white min-h-screen shadow-lg flex flex-col relative">
     
